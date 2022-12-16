@@ -2,13 +2,13 @@
 /**
  * The plugin bootstrap file
  *
- * @link              
+ * @link              https://github.com/Magnacarter/soundst-ad-uniits
  * @since             1.0.0
  * @package           SoundST/soundst-ad-units
  *
  * @wordpress-plugin
  * Plugin Name:       SoundST Ad Units
- * Plugin URI:        
+ * Plugin URI:        https://github.com/Magnacarter/soundst-ad-uniits
  * Description:       Customize ad units to display in content, sidebar, header, footer.
  * Version:           1.0.0
  * Author:            Adam Carter
