@@ -6,21 +6,13 @@ namespace Soundst\create_cpt;
 
 class Create_Custom_Post_Type {
 
-  // Set up additional options for the custom post type
-  private $labels = [];
-
-  // Set other options for Custom Post Type
+  // Set options for Custom Post Type
   private $args = [];
 
   // Constructor function to initialize the custom post type
-  public function __construct( $labels = [], $args = [] ) {
-    $this->set_labels( $labels );
+  public function __construct( $args = [] ) {
     $this->set_args( $args );
     add_action( 'init', array( $this, 'create_post_type' ) );
-  }
-
-  public function set_labels( $labels ) {
-    return $this->labels = $labels;
   }
 
   public function set_args( $args ) {
@@ -71,4 +63,4 @@ $args = [
 ];
 
 // Initialize ad unit post type
-new Create_Custom_Post_Type( $labels, $args );
+new Create_Custom_Post_Type( $args );
