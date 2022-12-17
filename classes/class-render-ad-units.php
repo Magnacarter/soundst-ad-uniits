@@ -38,13 +38,14 @@ class Render_Ad_Units extends PAU\Parse_Ad_Unit_Post {
     public function parse_ads() {
         $acfs = $this->ad_acfs;
         $placement_ids = [];
-        $ad_fields = [];
-        $location = [];
+        $ad_fields     = [];
+        $location      = [];
+
         foreach( $acfs as $acf ) {
             $placement_ids['placement_ids'] = $acf['ad_placement'];
-            $ad_fields['ad'] = $acf['ad'];
-            $location['location'] = $acf['position'];
-            $ad[] = [ $placement_ids, $location, $ad_fields ];
+            $ad_fields['ad']                = $acf['ad'];
+            $location['location']           = $acf['position'];
+            $ad[]                           = [ $placement_ids, $location, $ad_fields ];
         }
 
         if ( ! empty( $ad ) ){
