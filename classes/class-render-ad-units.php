@@ -37,37 +37,18 @@ class Render_Ad_Units extends PAU\Parse_Ad_Unit_Post {
      */
     public function parse_ads() {
         $acfs = $this->ad_acfs;
-
+        $placement_ids = [];
+        $ad_fields = [];
+        $location = [];
         foreach( $acfs as $acf ) {
-            if ( $acf['position'] == 'header' ) {
-                $h_placement_ids['placement_ids'] = $acf['ad_placement'];
-                $h_ad_fields['ad'] = $acf['ad'];
-                $h_location['location'] = 'header';
-                $h_arrs = array_merge( $h_placement_ids, $h_ad_fields );
-                $h_ad   = array_merge( $h_location, $h_arrs );
-            } elseif ( $acf['position'] == 'content_footer' ) {
-                $c_placement_ids['placement_ids'] = $acf['ad_placement'];
-                $c_ad_fields['ad'] = $acf['ad'];
-                $c_location['location'] = 'content_footer';
-                $c_arrs = array_merge( $c_placement_ids, $c_ad_fields );
-                $c_ad   = array_merge( $c_location, $c_arrs );
-            } elseif ( $acf['position'] == 'sidebar' ) {
-                $s_placement_ids['placement_ids'] = $acf['ad_placement'];
-                $s_ad_fields['ad'] = $acf['ad'];
-                $s_location['location'] = 'sidebar';
-                $s_arrs = array_merge( $s_placement_ids, $s_ad_fields );
-                $s_ad   = array_merge( $s_location, $s_arrs );
-            }
+            $placement_ids['placement_ids'] = $acf['ad_placement'];
+            $ad_fields['ad'] = $acf['ad'];
+            $location['location'] = $acf['position'];
+            $ad[] = [ $placement_ids, $location, $ad_fields ];
         }
 
-        if ( ! empty( $h_ad ) ){
-            $this->header_ad( $h_ad );
-        }
-        if ( ! empty( $c_ad ) ){
-            $this->bottom_content_ad( $c_ad );
-        }
-        if ( ! empty( $s_ad ) ){
-            $this->sidebar_ad( $s_ad );
+        if ( ! empty( $ad ) ){
+            $this->header_ad( $ad );
         }
     }
 
