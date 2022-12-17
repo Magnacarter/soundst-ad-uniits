@@ -36,11 +36,7 @@ class Render_Ad_Units extends PAU\Parse_Ad_Unit_Post {
      * @return void
      */
     public function parse_ads() {
-        $acfs          = $this->ad_acfs;
-        $placement_ids = [];
-        $ad_fields     = [];
-        $location      = [];
-        $ad            = [];
+        $acfs = $this->ad_acfs;
 
         foreach( $acfs as $acf ) {
             if ( $acf['position'] == 'header' ) {
