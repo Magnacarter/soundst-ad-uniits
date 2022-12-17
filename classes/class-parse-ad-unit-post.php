@@ -31,8 +31,19 @@ class Parse_Ad_Unit_Post {
 
         // Set the ad unit's acfs
         $this->set_custom_fields_from_ad_units();
+    }
 
-        error_log(print_r($this->ad_unit_acfs, true));
+    /**
+     * Get acfs from all ad units.
+     * 
+     * This is the main function we will use in our extended class
+     * to retrieve the acfs from all ad unit posts and render them
+     * with the child class.
+     * 
+     * @return array $acfs
+     */
+    public function get_ad_unit_acfs() {
+        return $this->ad_unit_acfs;
     }
     
     /**
@@ -44,7 +55,6 @@ class Parse_Ad_Unit_Post {
         foreach ( $ids as $id ) {
             $acfs[] = get_fields( $id );
         }
-        //error_log(print_r($acfs, true));
         $this->ad_unit_acfs = $acfs;
     }
 
