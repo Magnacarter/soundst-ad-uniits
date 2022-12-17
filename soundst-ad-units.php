@@ -47,7 +47,7 @@ class Init_Plugin {
 		register_uninstall_hook( __FILE__, array( __CLASS__, 'uninstall_plugin' ) );
 
         // Load plugin scripts and styles.
-        add_action( 'init', array( $this, 'public_scripts' ) );
+        add_action( 'init', [$this, 'public_scripts'] );
 
         // Load plugin classes.
 		add_action( 'plugins_loaded', [$this, 'init_autoloader'] );
@@ -129,5 +129,6 @@ class Init_Plugin {
 	public function init_autoloader() {
         require_once 'classes/class-custom-post-types.php';
 		require_once 'classes/class-parse-ad-unit-post.php';
+		require_once 'classes/class-render-ad-units.php';
 	}
 }

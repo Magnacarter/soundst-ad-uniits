@@ -5,9 +5,6 @@
 namespace Soundst\parse_ad_unit_post;
 use WP_Query;
 
-// Init class.
-new Parse_Ad_Unit_Post();
-
 class Parse_Ad_Unit_Post {
     /**
      * @var array ad_units
