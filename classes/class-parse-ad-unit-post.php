@@ -19,7 +19,11 @@ class Parse_Ad_Unit_Post {
      */
     public function __construct() {
         // Get the ad units.
-        $this->get_ad_units();
+        $ads = $this->get_ad_units();
+
+        // Set the ad units class prop.
+        $this->set_ad_units( $ads );
+
         error_log(print_r($this->ad_units, true));
     }
 
@@ -33,16 +37,14 @@ class Parse_Ad_Unit_Post {
             'post_type'      => 'ad_unit',
             'posts_per_page' => 10
         );
-        $ads = new WP_Query( $args );
-
-        // Set the ad units class prop.
-        $this->set_ad_units( $ads );
+        return $ads = new WP_Query( $args );
     }
 
     /**
      * Set ad units
      * 
-     * @return array ad_units
+     * @param array ads
+     * @return void
      */
     public function set_ad_units( $ads ) {
         $this->ad_units = $ads;
