@@ -23,7 +23,7 @@ class Render_Ad_Units extends PAU\Parse_Ad_Unit_Post {
         // Set ad_acfs.
         $this->set_ad_acfs();
 
-        //
+        // Create an array for each ad with all the data we need for rendering them.
         $this->parse_ads();
     }
 
@@ -36,7 +36,7 @@ class Render_Ad_Units extends PAU\Parse_Ad_Unit_Post {
      * @return void
      */
     public function parse_ads() {
-        $acfs = $this->ad_acfs;
+        $acfs          = $this->ad_acfs;
         $placement_ids = [];
         $ad_fields     = [];
         $location      = [];
