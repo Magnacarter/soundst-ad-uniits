@@ -50,7 +50,7 @@ class Init_Plugin {
         add_action( 'init', array( $this, 'public_scripts' ) );
 
         // Load plugin classes.
-		$this->init_autoloader();
+		add_action( 'plugins_loaded', [$this, 'init_autoloader'] );
 	}
 
     /**
@@ -128,5 +128,6 @@ class Init_Plugin {
 	 */
 	public function init_autoloader() {
         require_once 'classes/class-custom-post-types.php';
+		require_once 'classes/class-parse-ad-unit-post.php';
 	}
 }
