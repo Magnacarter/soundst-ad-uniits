@@ -52,6 +52,15 @@ class Render_Ad_Units extends PAU\Parse_Ad_Unit_Post {
     }
 
     /**
+     * Set the ad acfs class prop.
+     * 
+     * @return void
+     */
+    public function set_ad_acfs() {
+        $this->ad_acfs = parent::get_ad_unit_acfs();
+    }
+
+    /**
      * Parse ads
      * 
      * Merge the values into one array and send each to the 
@@ -118,7 +127,6 @@ class Render_Ad_Units extends PAU\Parse_Ad_Unit_Post {
      * Ad for sidebar.
      * 
      * @param array ad
-     * @return html built_ad
      */
     public function set_sidebar_array( $ad ) {
         $this->sidebar_array = $this->loop_over_ads( $ad );
@@ -222,8 +230,8 @@ class Render_Ad_Units extends PAU\Parse_Ad_Unit_Post {
     /**
      * Build content ad.
      * 
-     * @param array $ad_arr
-     * @return void
+     * @param object $content
+     * @return object $content
      */
     public function build_content_ad( $content ) {
         $ad_arr = $this->content_array;
@@ -231,6 +239,7 @@ class Render_Ad_Units extends PAU\Parse_Ad_Unit_Post {
         if ( empty( $ad_arr ) ) {
             return;
         }
+
         ob_start();
         ?>
             <div class="slick-slider">
@@ -256,14 +265,5 @@ class Render_Ad_Units extends PAU\Parse_Ad_Unit_Post {
         $output = ob_get_contents();
         ob_end_clean();
         return $content .= $output;
-    }
-
-    /**
-     * Set the ad acfs class prop.
-     * 
-     * @return void
-     */
-    public function set_ad_acfs() {
-        $this->ad_acfs = parent::get_ad_unit_acfs();
     }
 }
