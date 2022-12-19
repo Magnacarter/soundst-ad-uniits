@@ -46,11 +46,13 @@ class Init_Plugin {
 		register_deactivation_hook( __FILE__, array( __CLASS__, 'deactivate_plugin' ) );
 		register_uninstall_hook( __FILE__, array( __CLASS__, 'uninstall_plugin' ) );
 
+		require_once 'classes/class-custom-post-types.php';
+
         // Load plugin scripts and styles.
-        add_action( 'init', [$this, 'public_scripts'] );
+        add_action( 'wp_enqueue_scripts', [$this, 'public_scripts'] );
 
         // Load plugin classes.
-		add_action( 'plugins_loaded', [$this, 'init_autoloader'] );
+		add_action( 'wp_enqueue_scripts', [$this, 'init_autoloader'] );
 	}
 
     /**
@@ -60,14 +62,17 @@ class Init_Plugin {
 	 * @return void
 	 */
 	public function public_scripts() {
-        // Enqueue the styles.
-		wp_enqueue_style(   'soundst_styles', SOUNDST_PLUGIN_URL . 'plugin.css', array(), SOUNDST_PLUGIN_VER );
+        // Enqueue slick styles.
+		wp_enqueue_style(   'soundst_styles', SOUNDST_PLUGIN_URL . 'assets/css/slick.css', array(), SOUNDST_PLUGIN_VER );
 
-		// // Enqueue font awesome.
-		// wp_enqueue_script(  'soundst_font_awesome', 'https://kit.fontawesome.com/b2195895a2.js', array(), SOUNDST_PLUGIN_VER, false );
+		// Enqueue jquery.
+		wp_enqueue_script('jquery', 'https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js', array(), null, true);
 
-		// // Enqueue web component.
-		// wp_enqueue_script(  'soundst_webcomponent', SOUNDST_PLUGIN_URL . 'assets/js/casino-list.js', array(), SOUNDST_PLUGIN_VER, false );
+		// Enqueue slick js.
+		wp_enqueue_script( 'soundst_slick_js', SOUNDST_PLUGIN_URL . 'assets/js/slick.min.js', array(), SOUNDST_PLUGIN_VER, true );
+
+		// Enqueue plugin js.
+		wp_enqueue_script( 'soundst_webcomponent', SOUNDST_PLUGIN_URL . 'assets/js/plugin.js', array(), SOUNDST_PLUGIN_VER, true );
 	}
 
 	/**
@@ -127,7 +132,6 @@ class Init_Plugin {
 	 * @return void
 	 */
 	public function init_autoloader() {
-        require_once 'classes/class-custom-post-types.php';
 		require_once 'classes/class-parse-ad-unit-post.php';
 		require_once 'classes/class-render-ad-units.php';
 	}

@@ -47,7 +47,7 @@ class Parse_Ad_Unit_Post {
      * Set custom field values from ad unit posts.
      */
     public function set_custom_fields_from_ad_units() {
-        $ids = $this->ad_unit_ids;
+        $ids  = $this->ad_unit_ids;
         $acfs = [];
         foreach ( $ids as $id ) {
             $acfs[] = get_fields( $id );
@@ -64,8 +64,8 @@ class Parse_Ad_Unit_Post {
         $args = array(
             'post_type'      => 'ad_unit',
             'posts_per_page' => 10,
-            'post_status'   => 'publish',
-            'fields'        => 'ids'
+            'post_status'    => 'publish',
+            'fields'         => 'ids'
         );
         $ads = new WP_Query( $args );
 
