@@ -75,10 +75,12 @@ class Render_Ad_Units extends PAU\Parse_Ad_Unit_Post {
         $location      = [];
 
         foreach( $acfs as $acf ) {
-            $placement_ids['placement_ids'] = $acf['ad_placement'];
-            $ad_fields['ad']                = $acf['ad'];
-            $location['location']           = $acf['position'];
-            $ads[]                          = [ $placement_ids, $location, $ad_fields ];
+            if ( ! empty( $acf['ad_placement'] ) ) {
+                $placement_ids['placement_ids'] = $acf['ad_placement'];
+                $ad_fields['ad']                = $acf['ad'];
+                $location['location']           = $acf['position'];
+                $ads[]                          = [ $placement_ids, $location, $ad_fields ];
+            }
         }
 
         if ( ! empty( $ads ) ){
@@ -140,10 +142,16 @@ class Render_Ad_Units extends PAU\Parse_Ad_Unit_Post {
      */
     public function loop_over_ads( $ad ) {
         if ( ! empty( $ad ) ) {
+            global $post;
             $ids = $ad[0];
+
             foreach ( $ids as $id_arr ) {
+                if ( empty( $id_arr ) ) {
+                    return;
+                }
+
                 foreach ( $id_arr as $id ) {
-                    if ( is_single( (int)$id ) || is_page( (int)$id ) ) {
+                    if ( is_single( (int)$id ) || is_page ( (int)$id ) ) {
                         return $ad[2];
                     }
                 }
@@ -159,6 +167,7 @@ class Render_Ad_Units extends PAU\Parse_Ad_Unit_Post {
      */
     public function build_header_ad() {
         $ad_arr = $this->header_array;
+
         if ( empty( $ad_arr ) ) {
             return;
         }
@@ -197,6 +206,7 @@ class Render_Ad_Units extends PAU\Parse_Ad_Unit_Post {
      */
     public function build_sidebar_ad() {
         $ad_arr = $this->sidebar_array;
+
         if ( empty( $ad_arr ) ) {
             return;
         }
@@ -237,7 +247,7 @@ class Render_Ad_Units extends PAU\Parse_Ad_Unit_Post {
         $ad_arr = $this->content_array;
 
         if ( empty( $ad_arr ) ) {
-            return;
+            return $content;
         }
 
         ob_start();

@@ -63,7 +63,7 @@ class Parse_Ad_Unit_Post {
     public function get_ad_units() {
         $args = array(
             'post_type'      => 'ad_unit',
-            'posts_per_page' => 10,
+            'posts_per_page' => 99,
             'post_status'    => 'publish',
             'fields'         => 'ids'
         );
