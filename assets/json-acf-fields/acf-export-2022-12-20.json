@@ -108,6 +108,7 @@
                 "choices": {
                     "header": "Header",
                     "sidebar": "Sidebar",
+                    "sidebar-middle": "Sidebar Middle",
                     "content-footer": "Content Footer"
                 },
                 "default_value": false,
@@ -136,7 +137,7 @@
                 "endpoint": 0
             },
             {
-                "key": "field_639de52a5a43e",
+                "key": "field_63a0c8ddb886c",
                 "label": "Ad Placement",
                 "name": "ad_placement",
                 "aria-label": "",
@@ -150,16 +151,7 @@
                     "id": ""
                 },
                 "post_type": "",
-                "taxonomy": [
-                    "category:calendar",
-                    "category:essentials",
-                    "category:exploring",
-                    "category:lifestyle",
-                    "category:food-drink",
-                    "category:home-design",
-                    "category:life-style",
-                    "category:makers"
-                ],
+                "taxonomy": "",
                 "filters": [
                     "search",
                     "post_type",

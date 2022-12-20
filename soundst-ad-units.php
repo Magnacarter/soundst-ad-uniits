@@ -63,7 +63,10 @@ class Init_Plugin {
 	 */
 	public function public_scripts() {
         // Enqueue slick styles.
-		wp_enqueue_style(   'soundst_styles', SOUNDST_PLUGIN_URL . 'assets/css/slick.css', array(), SOUNDST_PLUGIN_VER );
+		wp_enqueue_style(  'soundst_slick_styles', SOUNDST_PLUGIN_URL . 'assets/css/slick.css', array(), SOUNDST_PLUGIN_VER );
+
+		// Enqueue plugin styles.
+		wp_enqueue_style(  'soundst_plugin_styles', SOUNDST_PLUGIN_URL . 'assets/css/plugin.css', array(), SOUNDST_PLUGIN_VER );
 
 		// Enqueue jquery.
 		wp_enqueue_script('jquery', 'https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js', array(), null, true);

@@ -23,6 +23,11 @@ class Render_Ad_Units extends PAU\Parse_Ad_Unit_Post {
      * @var array sidebar_array
      */
     private $sidebar_array;
+
+    /**
+     * @var array sidebar_middle_array
+     */
+    private $sidebar_middle_array;
     
     /**
      * @var array content_array
@@ -45,7 +50,9 @@ class Render_Ad_Units extends PAU\Parse_Ad_Unit_Post {
         add_action( 'wp_head', [$this, 'build_header_ad'] );
 
         // Hook into the sidebar for sidebar ad units.
-        add_action( 'get_sidebar', [$this, 'build_sidebar_ad'] );
+        add_action( 'get_sidebar', [$this, 'build_sidebar_ad'], 0, 15 );
+
+        add_action( 'dynamic_sidebar', [$this, 'sidebar_middle_ad'] );
 
         // Hook into the content for content ad units.
         add_filter( 'the_content', [$this, 'build_content_ad'], 1 );
@@ -103,6 +110,9 @@ class Render_Ad_Units extends PAU\Parse_Ad_Unit_Post {
                 case 'sidebar':
                     $this->set_sidebar_array( $ad );
                   break;
+                case 'sidebar-middle':
+                    $this->set_sidebar_middle_array( $ad );
+                break;
               }
         }
     }
@@ -132,6 +142,15 @@ class Render_Ad_Units extends PAU\Parse_Ad_Unit_Post {
      */
     public function set_sidebar_array( $ad ) {
         $this->sidebar_array = $this->loop_over_ads( $ad );
+    }
+
+    /**
+     * Ad for sidebar middle.
+     * 
+     * @param array ad
+     */
+    public function set_sidebar_middle_array( $ad ) {
+        $this->sidebar_middle_array = $this->loop_over_ads( $ad );
     }
 
     /**
@@ -213,6 +232,7 @@ class Render_Ad_Units extends PAU\Parse_Ad_Unit_Post {
 
         ob_start();
         ?>
+        <aside class="col-4 sidebar">
             <div class="slick-slider">
         <?php
         foreach ( $ad_arr['ad'] as $ad ) {
@@ -232,9 +252,56 @@ class Render_Ad_Units extends PAU\Parse_Ad_Unit_Post {
         }
         ?>
             </div>
+        </aside>
         <?php
         return $output = ob_get_contents();
         ob_end_clean();
+    }
+
+    function sidebar_middle_ad() {
+        static $counter = 0;
+        //print_r($GLOBALS['wp_registered_sidebars']);
+
+        // right sidebar in Twenty Ten. Adjust to your needs.
+        if ( 'header_top_widget_area' !== key( $GLOBALS['wp_registered_sidebars'] ) ) {
+            return;
+        }
+    
+        if ( 1 == $counter ) {
+            $ad_arr = $this->sidebar_middle_array;
+
+            if ( empty( $ad_arr ) ) {
+                return;
+            }
+
+            ob_start();
+            ?>
+
+                <div class="slick-slider">
+            <?php
+            foreach ( $ad_arr['ad'] as $ad ) {
+                $ad_link = $ad['ad_link'];
+                $img_url = $ad['ad_image']['url'];
+                $img_alt = $ad['ad_image']['alt'];
+                ?>
+                    <div class="slide">
+                        <a href="<?php echo esc_url( $ad_link ); ?>">
+                            <img 
+                                src="<?php echo esc_url( $img_url ) ?>"
+                                alt="<?php echo esc_attr( $img_alt ); ?>"
+                            />
+                        </a>
+                    </div>
+                <?php           
+            }
+            ?>
+                </div>
+
+            <?php
+            return $output = ob_get_contents();
+            ob_end_clean();
+        }
+        $counter += 1;
     }
 
     /**
