@@ -50,7 +50,7 @@ class Parse_Ad_Unit_Post {
         $ids  = $this->ad_unit_ids;
         $acfs = [];
         foreach ( $ids as $id ) {
-            $acfs[] = get_fields( $id );
+            $acfs[] = [$id => get_fields( $id )];
         }
         $this->ad_unit_acfs = $acfs;
     }
@@ -69,10 +69,12 @@ class Parse_Ad_Unit_Post {
         );
         $ads = new WP_Query( $args );
 
-        // Restore original Post Data
+       	$id_array = $ads->posts;
+		
+		// Restore original Post Data
         wp_reset_postdata();
-
-        return $id_array = $ads->posts;
+		
+		return $id_array;
     }
 
     /**

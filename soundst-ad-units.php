@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $plugin_url = plugin_dir_url( __FILE__ );
 define( 'SOUNDST_PLUGIN_URL', $plugin_url );
 define( 'SOUNDST_PLUGIN_DIR', plugin_dir_path( __DIR__ ) );
-define( 'SOUNDST_PLUGIN_VER', '1.0.0' );
+define( 'SOUNDST_PLUGIN_VER', '1.2.3' );
 
 new Init_Plugin();
 
@@ -48,11 +48,13 @@ class Init_Plugin {
 
 		require_once 'classes/class-custom-post-types.php';
 
-        // Load plugin scripts and styles.
-        add_action( 'wp_enqueue_scripts', [$this, 'public_scripts'] );
-
         // Load plugin classes.
 		add_action( 'wp_enqueue_scripts', [$this, 'init_autoloader'] );
+
+        // Load plugin scripts and styles.
+        add_action( 'wp_enqueue_scripts', [$this, 'public_scripts'] );
+		
+		require_once 'classes/class-shortcode-builder.php';
 	}
 
     /**
@@ -66,7 +68,7 @@ class Init_Plugin {
 		wp_enqueue_style(  'soundst_slick_styles', SOUNDST_PLUGIN_URL . 'assets/css/slick.css', array(), SOUNDST_PLUGIN_VER );
 
 		// Enqueue plugin styles.
-		wp_enqueue_style(  'soundst_plugin_styles', SOUNDST_PLUGIN_URL . 'assets/css/plugin.css', array(), SOUNDST_PLUGIN_VER );
+		wp_enqueue_style(  'soundst_plugin_styles', SOUNDST_PLUGIN_URL . 'assets/css/plugin.css?v='. SOUNDST_PLUGIN_VER, '' );
 
 		// Enqueue jquery.
 		wp_enqueue_script('jquery', 'https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js', array(), null, true);
@@ -75,7 +77,7 @@ class Init_Plugin {
 		wp_enqueue_script( 'soundst_slick_js', SOUNDST_PLUGIN_URL . 'assets/js/slick.min.js', array(), SOUNDST_PLUGIN_VER, true );
 
 		// Enqueue plugin js.
-		wp_enqueue_script( 'soundst_webcomponent', SOUNDST_PLUGIN_URL . 'assets/js/plugin.js', array(), SOUNDST_PLUGIN_VER, true );
+		wp_enqueue_script( 'soundst_adunit_js', SOUNDST_PLUGIN_URL . 'assets/js/plugin.js?v=' . SOUNDST_PLUGIN_VER , array(), SOUNDST_PLUGIN_VER, true );
 	}
 
 	/**

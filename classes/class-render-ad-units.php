@@ -5,10 +5,13 @@
 namespace Soundst\render_ad_units;
 use Soundst\parse_ad_unit_post as PAU;
 
-// Init class.
-new Render_Ad_Units();
-
 class Render_Ad_Units extends PAU\Parse_Ad_Unit_Post {
+	
+	/**
+	 * @var object class instance
+	 */
+	private static $instance = null;
+
     /**
      * @var array ad_acfs
      */
@@ -17,22 +20,17 @@ class Render_Ad_Units extends PAU\Parse_Ad_Unit_Post {
     /**
      * @var array header_array
      */
-    private $header_array;
+    private $header_array = [];
     
     /**
      * @var array sidebar_array
      */
-    private $sidebar_array;
-
-    /**
-     * @var array sidebar_middle_array
-     */
-    private $sidebar_middle_array;
+    private $sidebar_array = [];
     
     /**
      * @var array content_array
      */
-    private $content_array;
+    private $content_array = [];
 
     /**
      * Constructor function
@@ -42,20 +40,18 @@ class Render_Ad_Units extends PAU\Parse_Ad_Unit_Post {
 
         // Set ad_acfs.
         $this->set_ad_acfs();
-
-        // Create an array for each ad with all the data we need for rendering them.
-        $this->parse_ads();
-
-        // Hook into the header for header ad units.
-        add_action( 'wp_head', [$this, 'build_header_ad'] );
+		
+		// Parse the ads that are not shortcodes
+		$this->parse_ads();
+		
+		// Hook into the header for header ad units.
+        add_action( 'header_adunit', [$this, 'build_header_ad'] );
 
         // Hook into the sidebar for sidebar ad units.
-        add_action( 'get_sidebar', [$this, 'build_sidebar_ad'], 0, 15 );
-
-        add_action( 'dynamic_sidebar', [$this, 'sidebar_middle_ad'] );
+       	add_shortcode( 'sidebar-adunit', [$this, 'build_sidebar_ad'] );
 
         // Hook into the content for content ad units.
-        add_filter( 'the_content', [$this, 'build_content_ad'], 1 );
+        add_shortcode( 'content-adunit', [$this, 'build_content_ad'] );
     }
 
     /**
@@ -68,28 +64,55 @@ class Render_Ad_Units extends PAU\Parse_Ad_Unit_Post {
     }
 
     /**
-     * Parse ads
+     * Parse ad, for shortcodes
      * 
      * Merge the values into one array and send each to the 
      * appropreiate location hook function.
      * 
      * @return void
      */
-    public function parse_ads() {
-        $acfs          = $this->ad_acfs;
+    public function parse_ad( $ad_id ) {
+		$acfs                           = array_column( $this->ad_acfs, $ad_id );
+        $placement_ids                  = [];
+        $ad_fields                      = [];
+        $location                       = [];
+		$placement_ids['placement_ids'] = $acfs[0]['ad_placement'];
+		$ad_fields['ad']                = $acfs[0]['ad'];
+		$location['location']           = $acfs[0]['position'];
+		$ad_id['ad_id']                 = $ad_id;
+		$scroll['scroll']               = ($acfs['scroll_speed']) ? $acfs['scroll_speed'] : '2000';
+		$ad[]                           = [ $placement_ids, $location, $scroll, $ad_fields, $ad_id ];
+
+        if ( ! empty( $ad ) ){
+            $this->find_ad_location( $ad );
+        }
+    }
+	
+    /**
+     * Parse ads, for action hooks
+     * 
+     * Merge the values into one array and send each to the 
+     * appropreiate location hook function.
+     * 
+     * @return void
+     */
+    public function parse_ads() {		
+		$acfs          = $this->ad_acfs;
         $placement_ids = [];
         $ad_fields     = [];
         $location      = [];
-
         foreach( $acfs as $acf ) {
-            if ( ! empty( $acf['ad_placement'] ) ) {
-                $placement_ids['placement_ids'] = $acf['ad_placement'];
-                $ad_fields['ad']                = $acf['ad'];
-                $location['location']           = $acf['position'];
-                $ads[]                          = [ $placement_ids, $location, $ad_fields ];
+			$key = key( $acf );
+
+            if ( ! empty( $acf[$key]['ad_placement'] ) ) {
+				$placement_ids['placement_ids'] = $acf[$key]['ad_placement'];
+				$ad_fields['ad']                = $acf[$key]['ad'];
+				$location['location']           = $acf[$key]['position'];
+				$scroll['scroll']               = ( $acf[$key]['scroll_speed'] ) ? $acf[$key]['scroll_speed'] : '2000';
+				$ad_id['ad_id']                 = $key;
+				$ads[]                          = [$placement_ids, $location, $scroll, $ad_fields, $ad_id];
             }
         }
-
         if ( ! empty( $ads ) ){
             $this->find_ad_location( $ads );
         }
@@ -108,11 +131,8 @@ class Render_Ad_Units extends PAU\Parse_Ad_Unit_Post {
                     $this->set_content_array( $ad );
                   break;
                 case 'sidebar':
-                    $this->set_sidebar_array( $ad );
+					$this->set_sidebar_array( $ad );
                   break;
-                case 'sidebar-middle':
-                    $this->set_sidebar_middle_array( $ad );
-                break;
               }
         }
     }
@@ -141,16 +161,7 @@ class Render_Ad_Units extends PAU\Parse_Ad_Unit_Post {
      * @param array ad
      */
     public function set_sidebar_array( $ad ) {
-        $this->sidebar_array = $this->loop_over_ads( $ad );
-    }
-
-    /**
-     * Ad for sidebar middle.
-     * 
-     * @param array ad
-     */
-    public function set_sidebar_middle_array( $ad ) {
-        $this->sidebar_middle_array = $this->loop_over_ads( $ad );
+        $this->sidebar_array[] = $this->loop_over_ads( $ad );
     }
 
     /**
@@ -160,22 +171,81 @@ class Render_Ad_Units extends PAU\Parse_Ad_Unit_Post {
      * @return array ad[2]
      */
     public function loop_over_ads( $ad ) {
-        if ( ! empty( $ad ) ) {
+        if ( ! is_null( $ad ) ) {
             global $post;
-            $ids = $ad[0];
-
+            $ids      = array_unique( $ad[0] );
+			$ready_ad = [];
             foreach ( $ids as $id_arr ) {
                 if ( empty( $id_arr ) ) {
                     return;
                 }
 
                 foreach ( $id_arr as $id ) {
-                    if ( is_single( (int)$id ) || is_page ( (int)$id ) ) {
-                        return $ad[2];
+                    if ( 
+						is_single( $id )
+						||
+						is_page( $id )
+					) {
+						$ad[3]['scroll'] = ($ad[2]['scroll']) ? $ad[2]['scroll'] : '2000';
+						$ad[3]['ad_id'] = $ad[4];
+						$ready_ad[] = $ad[3];
                     }
                 }
             }
+			return $ready_ad;
         }
+    }
+	
+    /**
+     * Build sidebar ad.
+     * 
+     * @param array $ad_arr
+     * @return void
+     */
+    public function build_sidebar_ad( $atts, $content = null ) {
+		foreach ( $atts as $ad_id ) {
+			$this->parse_ad( $ad_id );
+			$arrs = $this->sidebar_array;
+		
+			foreach ( $arrs as $arr ) {
+				if ( empty( $arr ) ) {
+					continue;
+				} else {
+					$arr = $arr[0];
+				}
+			}
+
+			if ( empty( $arr ) ) {
+				return;
+			}
+
+			$this->scroll_speed_sidebar( $arr['scroll'] );
+
+			ob_start();
+			?>
+			<div class="slick-slider-sidebar">
+			<?php
+				foreach ( $arr['ad'] as $ad ) {
+					$ad_link = $ad['ad_link'];
+					$img_url = $ad['ad_image']['url'];
+					$img_alt = $ad['ad_image']['alt'];
+					?>
+					<div class="slide">
+						<a href="<?php echo esc_url( $ad_link ); ?>">
+							<img 
+								 src="<?php echo esc_url( $img_url ) ?>"
+								 alt="<?php echo esc_attr( $img_alt ); ?>"
+							/>
+						</a>
+					</div>
+					<?php
+				}
+			?>
+			</div>
+			<?php
+			$output = ob_get_clean();
+			print( $output . $content );
+		}
     }
 
     /**
@@ -185,123 +255,49 @@ class Render_Ad_Units extends PAU\Parse_Ad_Unit_Post {
      * @return void
      */
     public function build_header_ad() {
-        $ad_arr = $this->header_array;
+		$arrs = $this->header_array;
 
-        if ( empty( $ad_arr ) ) {
-            return;
-        }
+		foreach ( $arrs as $arr ) {
+			if ( empty( $arr ) ) {
+				continue;
+			} else {
+				$arr = $arr;
+			}
+		}
 
-        ob_start();
-        ?>
-            <div class="slick-slider">
-        <?php
-        foreach ( $ad_arr['ad'] as $ad ) {
-            $ad_link = $ad['ad_link'];
-            $img_url = $ad['ad_image']['url'];
-            $img_alt = $ad['ad_image']['alt'];
-            ?>
-                <div class="slide">
-                    <a href="<?php echo esc_url( $ad_link ); ?>">
-                        <img 
-                            src="<?php echo esc_url( $img_url ) ?>"
-                            alt="<?php echo esc_attr( $img_alt ); ?>"
-                        />
-                    </a>
-                </div>
-            <?php           
-        }
-        ?>
-            </div>
-        <?php
-        return $output = ob_get_contents();
-        ob_end_clean();
-    }
+		if ( empty( $arr ) ) {
+			return;
+		}
 
-    /**
-     * Build sidebar ad.
-     * 
-     * @param array $ad_arr
-     * @return void
-     */
-    public function build_sidebar_ad() {
-        $ad_arr = $this->sidebar_array;
+		$this->scroll_speed_header( $arr['scroll'] );
 
-        if ( empty( $ad_arr ) ) {
-            return;
-        }
-
-        ob_start();
-        ?>
-        <aside class="col-4 sidebar">
-            <div class="slick-slider">
-        <?php
-        foreach ( $ad_arr['ad'] as $ad ) {
-            $ad_link = $ad['ad_link'];
-            $img_url = $ad['ad_image']['url'];
-            $img_alt = $ad['ad_image']['alt'];
-            ?>
-                <div class="slide">
-                    <a href="<?php echo esc_url( $ad_link ); ?>">
-                        <img 
-                            src="<?php echo esc_url( $img_url ) ?>"
-                            alt="<?php echo esc_attr( $img_alt ); ?>"
-                        />
-                    </a>
-                </div>
-            <?php           
-        }
-        ?>
-            </div>
-        </aside>
-        <?php
-        return $output = ob_get_contents();
-        ob_end_clean();
-    }
-
-    function sidebar_middle_ad() {
-        static $counter = 0;
-        //print_r($GLOBALS['wp_registered_sidebars']);
-
-        // right sidebar in Twenty Ten. Adjust to your needs.
-        if ( 'header_top_widget_area' !== key( $GLOBALS['wp_registered_sidebars'] ) ) {
-            return;
-        }
-    
-        if ( 1 == $counter ) {
-            $ad_arr = $this->sidebar_middle_array;
-
-            if ( empty( $ad_arr ) ) {
-                return;
-            }
-
-            ob_start();
-            ?>
-
-                <div class="slick-slider">
-            <?php
-            foreach ( $ad_arr['ad'] as $ad ) {
-                $ad_link = $ad['ad_link'];
-                $img_url = $ad['ad_image']['url'];
-                $img_alt = $ad['ad_image']['alt'];
-                ?>
-                    <div class="slide">
-                        <a href="<?php echo esc_url( $ad_link ); ?>">
-                            <img 
-                                src="<?php echo esc_url( $img_url ) ?>"
-                                alt="<?php echo esc_attr( $img_alt ); ?>"
-                            />
-                        </a>
-                    </div>
-                <?php           
-            }
-            ?>
-                </div>
-
-            <?php
-            return $output = ob_get_contents();
-            ob_end_clean();
-        }
-        $counter += 1;
+		ob_start();
+		?>
+		<div class="row text-center" style="margin: 30px 0;">
+			<div class="slick-slider-header header-adunit">
+				<?php
+				foreach ( $arr['ad'] as $ad ) {
+					$ad_link = $ad['ad_link'];
+					$img_url = $ad['ad_image']['url'];
+					$img_alt = $ad['ad_image']['alt'];
+				?>
+				<div class="slide">
+					<a href="<?php echo esc_url( $ad_link ); ?>">
+						<img
+							 height="780px" width="90px"
+							 src="<?php echo esc_url( $img_url ) ?>"
+							 alt="<?php echo esc_attr( $img_alt ); ?>"
+							 />
+					</a>
+				</div>
+				<?php           
+				}
+				?>
+			</div>
+		</div>
+		<?php
+		$output = ob_get_clean();
+		print( $output );
     }
 
     /**
@@ -310,37 +306,125 @@ class Render_Ad_Units extends PAU\Parse_Ad_Unit_Post {
      * @param object $content
      * @return object $content
      */
-    public function build_content_ad( $content ) {
-        $ad_arr = $this->content_array;
+    public function build_content_ad( $atts, $content = null ) {
+		foreach ( $atts as $ad_id ) {
+			$this->parse_ad( $ad_id );
 
-        if ( empty( $ad_arr ) ) {
-            return $content;
-        }
+			$arrs = $this->content_array;
+		
+			foreach ( $arrs as $arr ) {
+				if ( empty( $arr ) ) {
+					continue;
+				} else {
+					$arr = $arr[0];
+				}
+			}
 
-        ob_start();
-        ?>
-            <div class="slick-slider">
-        <?php
-        foreach ( $ad_arr['ad'] as $ad ) {
-            $ad_link = $ad['ad_link'];
-            $img_url = $ad['ad_image']['url'];
-            $img_alt = $ad['ad_image']['alt'];
-            ?>
-                <div class="slide">
-                    <a href="<?php echo esc_url( $ad_link ); ?>">
-                        <img 
-                            src="<?php echo esc_url( $img_url ) ?>"
-                            alt="<?php echo esc_attr( $img_alt ); ?>"
-                        />
-                    </a>
-                </div>
-            <?php           
-        }
-        ?>
-            </div>
-        <?php
-        $output = ob_get_contents();
-        ob_end_clean();
-        return $content .= $output;
+			if ( empty( $arr ) ) {
+				return;
+			}
+
+			$this->scroll_speed_content( $arr['scroll'] );
+
+			ob_start();
+			?>
+			<div class="slick-slider-content">
+			<?php
+				foreach ( $arr['ad'] as $ad ) {
+					$ad_link = $ad['ad_link'];
+					$img_url = $ad['ad_image']['url'];
+					$img_alt = $ad['ad_image']['alt'];
+					?>
+					<div class="slide">
+						<a href="<?php echo esc_url( $ad_link ); ?>">
+							<img 
+								 src="<?php echo esc_url( $img_url ) ?>"
+								 alt="<?php echo esc_attr( $img_alt ); ?>"
+							/>
+						</a>
+					</div>
+					<?php
+				}
+			?>
+			</div>
+			<?php
+			$output = ob_get_clean();
+			print( $output . $content );
+		}
     }
+
+	/**
+	 * If the class isn't instantiated, initialize it.
+	 *
+	 * @return object
+	 */
+	public static function getInstance() {
+		if ( self::$instance == null ) {
+			self::$instance = new Render_Ad_Units();
+		}
+ 
+		return self::$instance;
+	}
+	
+	/**
+	 *
+	 */
+	public function scroll_speed_header( $speed ) {
+		?>
+		<script>
+			const $j = jQuery.noConflict();
+			$j(function(){
+				$j('.slick-slider-header').slick({
+					autoplay: true,
+					autoplaySpeed: <?php echo $speed; ?>,
+					arrows: false,
+					fade: true,
+					centerMode: true
+				});
+			});
+		</script>
+		<?php
+	}
+	
+	/**
+	 *
+	 */
+	public function scroll_speed_sidebar( $speed ) {
+		?>
+		<script>
+			const $jq = jQuery.noConflict();
+			$jq(function(){
+				$jq('.slick-slider-sidebar').slick({
+					autoplay: true,
+					autoplaySpeed: <?php echo $speed; ?>,
+					arrows: false,
+					fade: true,
+					centerMode: true
+				});
+			});
+		</script>
+		<?php
+	}
+	
+	/**
+	 *
+	 */
+	public function scroll_speed_content( $speed ) {
+		?>
+		<script>
+			const $jqw = jQuery.noConflict();
+			$jqw(function(){
+				$jqw('.slick-slider-content').slick({
+					autoplay: true,
+					autoplaySpeed: <?php echo $speed; ?>,
+					arrows: false,
+					fade: true,
+					centerMode: true
+				});
+			});
+		</script>
+		<?php
+	}
 }
+
+$ad_unit = Render_Ad_Units::getInstance();

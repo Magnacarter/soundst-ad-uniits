@@ -12,3 +12,31 @@ aside .slick-slide img {
 .main-footer .slick-slider.slick-initialized {
     display: none;
 }
+aside .slick-slider.content.slick-initialized {
+	display: none;
+}
+
+.slick-slider.header-adunit {
+	margin: 0 auto; 
+	width: 100%;
+}
+.slick-slider.header-adunit img {
+	padding-left: 15px;
+	padding-right: 15px;
+}
+
+nav.navbar .slick-slider.header-adunit a img {
+	max-height: 90px;
+    width: 780px;
+    margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+	.slick-slider.header-adunit {
+		margin: 0 auto; 
+	}
+	.slick-slider.header-adunit img {
+		padding-left: 0px;
+		padding-right: 0px;
+	}
+}

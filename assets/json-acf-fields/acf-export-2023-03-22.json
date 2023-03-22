@@ -7,7 +7,6 @@
                 "key": "field_639de41a5a438",
                 "label": "Ad Unit",
                 "name": "",
-                "aria-label": "",
                 "type": "tab",
                 "instructions": "",
                 "required": 0,
@@ -17,6 +16,7 @@
                     "class": "",
                     "id": ""
                 },
+                "aria-label": "",
                 "placement": "top",
                 "endpoint": 0
             },
@@ -24,7 +24,6 @@
                 "key": "field_639de4455a439",
                 "label": "Ad",
                 "name": "ad",
-                "aria-label": "",
                 "type": "repeater",
                 "instructions": "",
                 "required": 0,
@@ -34,6 +33,7 @@
                     "class": "",
                     "id": ""
                 },
+                "aria-label": "",
                 "layout": "table",
                 "pagination": 0,
                 "min": 0,
@@ -46,7 +46,6 @@
                         "key": "field_639de45a5a43a",
                         "label": "Ad Link",
                         "name": "ad_link",
-                        "aria-label": "",
                         "type": "text",
                         "instructions": "",
                         "required": 0,
@@ -56,6 +55,7 @@
                             "class": "",
                             "id": ""
                         },
+                        "aria-label": "",
                         "default_value": "",
                         "maxlength": "",
                         "placeholder": "",
@@ -67,7 +67,6 @@
                         "key": "field_639de46c5a43b",
                         "label": "Ad Image",
                         "name": "ad_image",
-                        "aria-label": "",
                         "type": "image",
                         "instructions": "",
                         "required": 0,
@@ -77,6 +76,7 @@
                             "class": "",
                             "id": ""
                         },
+                        "aria-label": "",
                         "return_format": "array",
                         "library": "all",
                         "min_width": "",
@@ -95,7 +95,6 @@
                 "key": "field_639de4a25a43c",
                 "label": "Position",
                 "name": "position",
-                "aria-label": "",
                 "type": "select",
                 "instructions": "",
                 "required": 0,
@@ -108,22 +107,41 @@
                 "choices": {
                     "header": "Header",
                     "sidebar": "Sidebar",
-                    "sidebar-middle": "Sidebar Middle",
                     "content-footer": "Content Footer"
                 },
                 "default_value": false,
-                "return_format": "value",
-                "multiple": 0,
                 "allow_null": 0,
+                "multiple": 0,
                 "ui": 0,
+                "return_format": "value",
                 "ajax": 0,
                 "placeholder": ""
+            },
+            {
+                "key": "field_6414ae0e5144b",
+                "label": "Scroll Speed",
+                "name": "scroll_speed",
+                "type": "number",
+                "instructions": "Scroll per frame in one second increments.\r\n\r\n1000 = 1 second",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": "",
+                "placeholder": "",
+                "prepend": "",
+                "append": "",
+                "min": "",
+                "max": "",
+                "step": ""
             },
             {
                 "key": "field_639de5155a43d",
                 "label": "Placement",
                 "name": "",
-                "aria-label": "",
                 "type": "tab",
                 "instructions": "",
                 "required": 0,
@@ -133,6 +151,7 @@
                     "class": "",
                     "id": ""
                 },
+                "aria-label": "",
                 "placement": "top",
                 "endpoint": 0
             },
@@ -140,7 +159,6 @@
                 "key": "field_63a0c8ddb886c",
                 "label": "Ad Placement",
                 "name": "ad_placement",
-                "aria-label": "",
                 "type": "relationship",
                 "instructions": "",
                 "required": 0,
@@ -150,6 +168,7 @@
                     "class": "",
                     "id": ""
                 },
+                "aria-label": "",
                 "post_type": "",
                 "taxonomy": "",
                 "filters": [

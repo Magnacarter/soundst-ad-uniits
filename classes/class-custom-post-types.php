@@ -59,7 +59,8 @@ $args = [
   'exclude_from_search' => false,
   'publicly_queryable'  => true,
   'capability_type'     => 'post',
-  'show_in_rest'        => true
+  'show_in_rest'        => true,
+  'register_meta_box_cb' => 'render_ad_shortcode_metabox'
 ];
 
 // Initialize ad unit post type
